@@ -74,3 +74,9 @@ def test_delete_todo():
 def test_update_nonexistent_todo():
     response = client.patch("/todos/9999", json={"completed": True})
     assert response.status_code == 404
+
+def test_create_todo_with_priority():
+    response = client.post("/todos", json={"title": "紧急任务", "priority": "high"})
+    assert response.status_code == 201
+    data = response.json()
+    assert data["priority"] == "high"
