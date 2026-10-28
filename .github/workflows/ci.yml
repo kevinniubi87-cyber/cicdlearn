@@ -1,0 +1,56 @@
+name: CI
+
+# 触发条件：push 到任意分支，或提交 PR 到 main
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Job 1：运行后端测试
+  backend-test:
+    runs-on: ubuntu-latest          # 运行在 GitHub 提供的 Ubuntu 虚拟机
+    defaults:
+      run:
+        working-directory: backend  # 以下 steps 默认在 backend/ 目录执行
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4   # 官方 Action，把仓库代码拉到虚拟机
+
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip                # 缓存 pip 包，加快后续运行速度
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 运行测试
+        run: pytest tests/ -v
+
+  # Job 2：运行前端测试
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装依赖
+        run: npm ci                 # ci 命令比 install 更严格，适合 CI 环境
+
+      - name: 运行测试
+        run: npm test
