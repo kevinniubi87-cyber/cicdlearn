@@ -20,17 +20,20 @@ app.add_middleware(
 
 class TodoCreate(BaseModel):
     title: str
+    priority: str = "normal"
 
 
 class TodoUpdate(BaseModel):
     title: Optional[str] = None
     completed: Optional[bool] = None
+    priority: Optional[str] = None
 
 
 class TodoResponse(BaseModel):
     id: int
     title: str
     completed: bool
+    priority: str
 
     model_config = {"from_attributes": True}
 
@@ -42,7 +45,7 @@ def list_todos(db: Session = Depends(get_db)):
 
 @app.post("/todos", response_model=TodoResponse, status_code=201)
 def create_todo(todo: TodoCreate, db: Session = Depends(get_db)):
-    db_todo = models.Todo(title=todo.title)
+    db_todo = models.Todo(title=todo.title,priority=todo.priority)
     db.add(db_todo)
     db.commit()
     db.refresh(db_todo)
