@@ -1,0 +1,16 @@
+name: Practice Workflow
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Hello CI
+        run: echo "Hello CI!"
+      - name: Print Date
+        run: |
+          date
+          ls -la
